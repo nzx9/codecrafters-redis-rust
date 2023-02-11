@@ -14,9 +14,15 @@ fn main() {
             Ok(mut _stream) => {
                 println!("accepted new connection");
                 let mut buf = [0; 512];
-                _stream.read(&mut buf).unwrap();
-                println!("received: {}", String::from_utf8_lossy(&buf));
-                _stream.write("+PONG\r\n".as_bytes()).unwrap();
+
+                loop {
+                    let bytes_read = _stream.read(&mut buf).unwrap();
+                    println!("read {} bytes", bytes_read);
+                    if bytes_read.eq(&0) {
+                        break;
+                    }
+                    _stream.write("+PONG\r\n".as_bytes()).unwrap();
+                }
             }
             Err(e) => {
                 println!("error: {}", e);
